@@ -12,7 +12,7 @@ class WeightedRatingStrategy(StrategyInterface):
     Driver selection strategy that balances distance and rating compatibility.
     """
     
-    def __init__(self, distance_weight: float = 0.1, rating_weight: float = 0.9):
+    def __init__(self, distance_weight: float = 0.6, rating_weight: float = 0.4):
         """
         Initialize the strategy with weights for distance vs rating matching.
         
