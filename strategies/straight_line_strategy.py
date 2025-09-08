@@ -26,7 +26,7 @@ class StraightLineStrategy(StrategyInterface):
         min_distance = float('inf')
         
         for driver in eligible_drivers:
-            distance = driver.location.calculate_distance(ride_request.pickup_location)
+            distance = driver.location.calculate_distance_in_kilometer(ride_request.pickup_location)
             
             if distance < min_distance:
                 min_distance = distance
