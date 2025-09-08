@@ -9,7 +9,22 @@ from pprint import pprint
 
 
 class RideShareSimulator:
+    """
+    Main simulation engine for the ride-sharing system.
+    
+    The RideShareSimulator orchestrates the entire simulation process by managing
+    events, drivers, and ride requests. It uses a discrete event simulation approach
+    where events are processed in chronological order to simulate the real-time
+    operation of a ride-sharing platform.
+    
+    """
     def __init__(self, data_file_path: str):
+        """
+        Initialize the RideShareSimulator with data from the specified file.
+        
+        Args:
+            data_file_path (str): Path to the JSON file containing drivers and ride requests
+        """
         self.strategy = StraightLineStrategy()
         self.simulation_result = SimulationResult()
 
@@ -25,15 +40,25 @@ class RideShareSimulator:
         }
     
     def _schedule_events(self):
+        """
+        Schedule initial ride request events in the event queue.
+        """
         for ride_request in self.data_parser.get_ride_requests():
             self._events_manager.add_event(RideRequestEvent(ride_request.timestamp, ride_request))
             
     def _process_ride_request_event(self, ride_request_event: RideRequestEvent):
+        """
+        Process a ride request event by finding the best driver and scheduling completion.
+        
+        Args:
+            ride_request_event (RideRequestEvent): The ride request event to process
+        """
         print(f"Processing ride request event: {ride_request_event.ride_request.id}")
         ride_request = ride_request_event.ride_request
         best_driver = self.strategy.get_best_driver(ride_request, self.drivers)
         
         if best_driver:
+            # Calculate pickup ETA assuming average speed of 30 km/h
             pickup_eta_minutes = best_driver.location.calculate_distance_in_kilometer(ride_request.pickup_location) / 30
             self.simulation_result.add_assignment(
                 Assignment(
@@ -44,6 +69,7 @@ class RideShareSimulator:
                     )
                 )
 
+            # Calculate total ride time (pickup + dropoff) and schedule completion
             drive_time = ride_request.dropoff_location.calculate_distance_in_kilometer(ride_request.pickup_location) / 30
             completion_time = ride_request.timestamp + pickup_eta_minutes + drive_time
             best_driver.assign_ride(ride_request.id, completion_time)
@@ -55,10 +81,24 @@ class RideShareSimulator:
             
             
     def _process_ride_completion_event(self, ride_completion_event: RideCompletionEvent):
+        """
+        Process a ride completion event by freeing up the driver.
+        
+        Args:
+            ride_completion_event (RideCompletionEvent): The ride completion event to process
+        """
         print(f"Processing ride completion event: {ride_completion_event.driver.id}")
         ride_completion_event.driver.complete_ride()
         
     def run(self):
+        """
+        Execute the complete ride-sharing simulation.
+        
+        Processes all events in chronological order using the event manager.
+        Each event is dispatched to its appropriate handler method based on
+        the event type. The simulation continues until all events have been
+        processed.
+        """
         for event in self._events_manager.get_next_event_generator():
             try:
                 event_type = event.__class__
@@ -67,6 +107,12 @@ class RideShareSimulator:
                 print(f"No handler found for event: {event.__class__}")
                 
                 
-s = RideShareSimulator('datasets/sample_data.json')
-s.run()
-pprint(s.simulation_result.to_dict())
+# Example usage and execution
+if __name__ == "__main__":
+    # Create and run the simulation
+    simulator = RideShareSimulator('datasets/sample_data.json')
+    simulator.run()
+    
+    # Display the simulation results
+    print("Simulation Results:")
+    pprint(simulator.simulation_result.to_dict())
