@@ -1,11 +1,10 @@
-from strategies.straight_line_strategy import StraightLineStrategy
+from strategies.strategy_factory import StrategyFactory
 from models.simulation_result import SimulationResult
 from events_manager import EventsManager
 from events.ride_request_event import RideRequestEvent
 from events.ride_completion_event import RideCompletionEvent
 from data_parser import RideSimulationDataParser
 from models.assignment import Assignment
-from pprint import pprint
 
 
 class RideShareSimulator:
@@ -16,21 +15,32 @@ class RideShareSimulator:
     events, drivers, and ride requests. It uses a discrete event simulation approach
     where events are processed in chronological order to simulate the real-time
     operation of a ride-sharing platform.
-    
     """
-    def __init__(self, data_file_path: str):
+    def __init__(self, data_file_path: str, strategy_type: str = 'straight', 
+                 distance_weight: float = 0.6, rating_weight: float = 0.4):
         """
-        Initialize the RideShareSimulator with data from the specified file.
+        Initialize the RideShareSimulator with data and strategy configuration.
         
         Args:
             data_file_path (str): Path to the JSON file containing drivers and ride requests
+            strategy_type (str): Type of strategy to use ('straight' or 'weighted')
+            distance_weight (float): Weight for distance component (for weighted strategy)
+            rating_weight (float): Weight for rating component (for weighted strategy)
         """
-        self.strategy = StraightLineStrategy()
         self.simulation_result = SimulationResult()
-
         self.data_parser = RideSimulationDataParser(data_file_path)
         self._events_manager = EventsManager()
         self.drivers = self.data_parser.get_drivers()
+        
+        # Create strategy using factory
+        if strategy_type == 'straight':
+            self.strategy = StrategyFactory.create_strategy(strategy_type=strategy_type)
+        else:
+            self.strategy = StrategyFactory.create_strategy(
+                strategy_type=strategy_type,
+                distance_weight=distance_weight,
+                rating_weight=rating_weight
+            )
         
         self._schedule_events()
         
@@ -38,6 +48,7 @@ class RideShareSimulator:
             RideRequestEvent: self._process_ride_request_event,
             RideCompletionEvent: self._process_ride_completion_event
         }
+    
     
     def _schedule_events(self):
         """
@@ -59,7 +70,7 @@ class RideShareSimulator:
         
         if best_driver:
             # Calculate pickup ETA assuming average speed of 30 km/h
-            pickup_eta_minutes = best_driver.location.calculate_distance_in_kilometer(ride_request.pickup_location) / 30
+            pickup_eta_minutes = (best_driver.location.calculate_distance_in_kilometer(ride_request.pickup_location) / 30) * 60
             self.simulation_result.add_assignment(
                 Assignment(
                     timestamp=ride_request.timestamp,
@@ -70,7 +81,7 @@ class RideShareSimulator:
                 )
 
             # Calculate total ride time (pickup + dropoff) and schedule completion
-            drive_time = ride_request.dropoff_location.calculate_distance_in_kilometer(ride_request.pickup_location) / 30
+            drive_time = (ride_request.dropoff_location.calculate_distance_in_kilometer(ride_request.pickup_location) / 30) * 60
             completion_time = ride_request.timestamp + pickup_eta_minutes + drive_time
             best_driver.assign_ride(ride_request.id, completion_time)
             self._events_manager.add_event(RideCompletionEvent(completion_time, ride_request.id, best_driver))
@@ -105,4 +116,3 @@ class RideShareSimulator:
                 self._EVENT_TYPE_TO_HANDLER[event_type](event)
             except KeyError:
                 print(f"No handler found for event: {event.__class__}")
-                
