@@ -1,0 +1,74 @@
+{
+  "drivers": [
+    {
+      "id": "driver_001",
+      "name": "Alice Johnson",
+      "vehicle_type": "private",
+      "location": {"latitude": 40, "longitude": -70},
+      "rating": 4.8
+    },
+    {
+      "id": "driver_002",
+      "name": "Bob Smith",
+      "vehicle_type": "suv",
+      "location": {"latitude": 1, "longitude": 1},
+      "rating": 4.5
+    },
+    {
+      "id": "driver_003",
+      "name": "Carol Davis",
+      "vehicle_type": "private",
+      "location": {"latitude": 1, "longitude": 1},
+      "rating": 4.9
+    },
+    {
+      "id": "driver_004",
+      "name": "David Wilson",
+      "vehicle_type": "suv",
+      "location": {"latitude": 1, "longitude": 1},
+      "rating": 4.6
+    }
+  ],
+  "ride_requests": [
+    {
+      "id": "ride_001",
+      "pickup": {"latitude": 40.7000, "longitude": -74.0000},
+      "dropoff": {"latitude": 40.7000, "longitude": -100.0000},
+      "requested_vehicle_type": "private",
+      "timestamp": 1640995200.0,
+      "user_rating": 4.7
+    },
+    {
+      "id": "ride_002",
+      "pickup": {"latitude": 40.7200, "longitude": -74.0100},
+      "dropoff": {"latitude": -40.7600, "longitude": 74.0600},
+      "requested_vehicle_type": "suv",
+      "timestamp": 1640995260.0,
+      "user_rating": 4.3
+    },
+    {
+      "id": "ride_003",
+      "pickup": {"latitude": 40.7300, "longitude": -74.0200},
+      "dropoff": {"latitude": -40.7700, "longitude": 74.0700},
+      "requested_vehicle_type": "private",
+      "timestamp": 1640995320.0,
+      "user_rating": 4.9
+    },
+    {
+      "id": "ride_004",
+      "pickup": {"latitude": 40.7400, "longitude": -74.0300},
+      "dropoff": {"latitude": -40.7800, "longitude": 74.0800},
+      "requested_vehicle_type": "suv",
+      "timestamp": 1640995380.0,
+      "user_rating": 4.2
+    },
+    {
+      "id": "ride_005",
+      "pickup": {"latitude": 40.7100, "longitude": -74.0050},
+      "dropoff": {"latitude": -40.7900, "longitude": 74.0900},
+      "requested_vehicle_type": "private",
+      "timestamp": 1640995440.0,
+      "user_rating": 4.8
+    }
+  ]
+}
