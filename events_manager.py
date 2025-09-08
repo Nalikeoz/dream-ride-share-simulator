@@ -49,14 +49,14 @@ class EventsManager:
             RideRequestEvent has MEDIUM priority
             Unknown event types default to LOW priority
         """
-        _event_priority_map = {
+        _EVENT_PRIORITY_MAP = {
             RideCompletionEvent: EventPriority.HIGH,
             RideRequestEvent: EventPriority.MEDIUM
         }
         
         event_class = event.__class__
-        if event_class in _event_priority_map:
-            return _event_priority_map[event_class]
+        if event_class in _EVENT_PRIORITY_MAP:
+            return _EVENT_PRIORITY_MAP[event_class]
         
         return EventPriority.LOW
     
