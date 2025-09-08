@@ -1,5 +1,6 @@
 import math
 from dataclasses import dataclass
+from geopy.distance import geodesic
 
 
 @dataclass
@@ -7,9 +8,20 @@ class Location:
     latitude: float
     longitude: float
     
-    def calculate_distance(self, other_location: 'Location') -> float:
-        driver_to_pickup_distance = math.dist(
-            (self.latitude, self.longitude), 
+    def calculate_distance_in_kilometer(self, other_location: 'Location') -> float:
+        """
+        Calculate the distance between two locations in kilometers.
+        
+        Args:
+            other_location (Location): The other location to calculate the distance to
+            
+        Returns:
+            float: The distance in kilometers
+        """
+        distance_object = geodesic(
+            (self.latitude, self.longitude),
             (other_location.latitude, other_location.longitude)
         )
-        return driver_to_pickup_distance
+        
+        distance_in_kilometers = distance_object.kilometers
+        return distance_in_kilometers
