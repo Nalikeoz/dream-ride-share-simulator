@@ -34,14 +34,11 @@ class RideShareSimulator:
         self.drivers = self.data_parser.get_drivers()
         
         # Create strategy using factory
-        if strategy_type == StrategyType.STRAIGHT:
-            self.strategy = StrategyFactory.create_strategy(strategy_type=strategy_type)
-        else:
-            self.strategy = StrategyFactory.create_strategy(
-                strategy_type=strategy_type,
-                distance_weight=distance_weight,
-                rating_weight=rating_weight
-            )
+        self.strategy = StrategyFactory.create_strategy(
+            strategy_type=strategy_type,
+            distance_weight=distance_weight,
+            rating_weight=rating_weight
+        )
         
         self._schedule_events()
         

@@ -63,8 +63,14 @@ class StrategyFactory:
         final_params = {**strategy_config['default_params'], **kwargs}
         
         # Create and return strategy instance
-        if final_params:
-            return strategy_class(**final_params)
+        # Filter out parameters that the strategy doesn't need
+        strategy_params = {}
+        for param_name, param_value in final_params.items():
+            if param_name in strategy_config['required_params']:
+                strategy_params[param_name] = param_value
+        
+        if strategy_params:
+            return strategy_class(**strategy_params)
         else:
             return strategy_class()
     
