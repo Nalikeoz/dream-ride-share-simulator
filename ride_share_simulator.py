@@ -5,6 +5,7 @@ from events.ride_request_event import RideRequestEvent
 from events.ride_completion_event import RideCompletionEvent
 from data_parser import RideSimulationDataParser
 from models.assignment import Assignment
+from consts import StrategyType
 
 
 class RideShareSimulator:
@@ -16,7 +17,7 @@ class RideShareSimulator:
     where events are processed in chronological order to simulate the real-time
     operation of a ride-sharing platform.
     """
-    def __init__(self, data_file_path: str, strategy_type: str = 'straight', 
+    def __init__(self, data_file_path: str, strategy_type: str = StrategyType.STRAIGHT, 
                  distance_weight: float = 0.6, rating_weight: float = 0.4):
         """
         Initialize the RideShareSimulator with data and strategy configuration.
@@ -33,7 +34,7 @@ class RideShareSimulator:
         self.drivers = self.data_parser.get_drivers()
         
         # Create strategy using factory
-        if strategy_type == 'straight':
+        if strategy_type == StrategyType.STRAIGHT:
             self.strategy = StrategyFactory.create_strategy(strategy_type=strategy_type)
         else:
             self.strategy = StrategyFactory.create_strategy(
@@ -64,7 +65,6 @@ class RideShareSimulator:
         Args:
             ride_request_event (RideRequestEvent): The ride request event to process
         """
-        print(f"Processing ride request event: {ride_request_event.ride_request.id}")
         ride_request = ride_request_event.ride_request
         best_driver = self.strategy.get_best_driver(ride_request, self.drivers)
         
@@ -82,12 +82,11 @@ class RideShareSimulator:
 
             # Calculate total ride time (pickup + dropoff) and schedule completion
             drive_time = (ride_request.dropoff_location.calculate_distance_in_kilometer(ride_request.pickup_location) / 30) * 60
-            completion_time = ride_request.timestamp + pickup_eta_minutes + drive_time
+            completion_time = ride_request.timestamp + (pickup_eta_minutes * 60) + (drive_time * 60)
             best_driver.assign_ride(ride_request.id, completion_time)
             self._events_manager.add_event(RideCompletionEvent(completion_time, ride_request.id, best_driver))
             
         else:
-            print(f"No driver found for ride request: {ride_request.id}")
             self.simulation_result.add_unassigned_ride(ride_request.id)
             
             
@@ -98,7 +97,6 @@ class RideShareSimulator:
         Args:
             ride_completion_event (RideCompletionEvent): The ride completion event to process
         """
-        print(f"Processing ride completion event: {ride_completion_event.driver.id}")
         ride_completion_event.driver.complete_ride()
         
     def run(self):

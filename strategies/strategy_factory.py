@@ -9,6 +9,7 @@ from typing import Dict, Any, Type
 from .strategy_interface import StrategyInterface
 from .straight_line_strategy import StraightLineStrategy
 from .weighted_rating_strategy import WeightedRatingStrategy
+from consts import StrategyType
 
 
 class StrategyFactory:
@@ -21,12 +22,12 @@ class StrategyFactory:
     
     # Registry of available strategies with their parameter requirements
     _STRATEGY_REGISTRY: Dict[str, Dict[str, Any]] = {
-        'straight': {
+        StrategyType.STRAIGHT: {
             'class': StraightLineStrategy,
             'required_params': [],
             'default_params': {}
         },
-        'weighted': {
+        StrategyType.WEIGHTED: {
             'class': WeightedRatingStrategy,
             'required_params': ['distance_weight', 'rating_weight'],
             'default_params': {'distance_weight': 0.6, 'rating_weight': 0.4}
@@ -85,7 +86,7 @@ class StrategyFactory:
         final_params = {**strategy_config['default_params'], **params}
         
         # Validate based on strategy type
-        if strategy_type == 'weighted':
+        if strategy_type == StrategyType.WEIGHTED:
             distance_weight = final_params.get('distance_weight', 0.6)
             rating_weight = final_params.get('rating_weight', 0.4)
             
@@ -111,12 +112,12 @@ class StrategyFactory:
         Returns:
             Dict[str, Any]: Parameter information
         """
-        if strategy_type == 'straight':
+        if strategy_type == StrategyType.STRAIGHT:
             return {
                 'description': 'No parameters required',
                 'parameters': {}
             }
-        elif strategy_type == 'weighted':
+        elif strategy_type == StrategyType.WEIGHTED:
             return {
                 'description': 'Requires distance and rating weights',
                 'parameters': {

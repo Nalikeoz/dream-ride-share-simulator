@@ -120,7 +120,7 @@ class SimulationResult:
                 }
                 for assignment in self.assignments
             ],
-            "unassigned_rides": self.unassigned_ride_ids,
+            "unassigned_ride_ids": self.unassigned_ride_ids,
             "metrics": {
                 **self.metrics,
                 "total_rides": self.get_total_rides(),
